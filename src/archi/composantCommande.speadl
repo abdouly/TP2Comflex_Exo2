@@ -1,0 +1,79 @@
+import interfaces.IAF
+import interfaces.IAPP
+import interfaces.IAdmin
+import interfaces.ICommande
+import interfaces.IInfosProvider
+import interfaces.ITB
+
+namespace definitionsComposants{
+	
+	component ComposantClient{
+		provides unClient: Runnable
+		requires unStoreIAF: IAF
+		requires unStoreIAPP: IAPP
+	}
+	
+	component ComposantBank{
+		provides uneBank: ITB
+		requires estore: IAdmin
+		requires anne: IAdmin
+		requires bob: IAdmin
+	}
+	
+	component ComposantAccount{
+		provides unAccount : IAdmin
+	}
+	
+	component ComposantProviderCommande{
+		provides unProviderCommande: ICommande
+	}
+	
+	component ComposantProviderInfos{
+		provides unProviderInfos: IInfosProvider
+	}
+	
+	component ComposantStoreIAF{
+		requires uneBank: ITB
+		requires unProviderCommande: ICommande
+		requires unProviderInfos: IInfosProvider
+		provides unStoreIAF: IAF
+	}
+	
+	component ComposantStoreIAPP{
+		requires uneBank: ITB
+		requires unProviderCommande: ICommande
+		requires unProviderInfos: IInfosProvider
+		provides unStoreIAPP: IAPP
+	}
+	
+	component ComposantCommandeComposite{
+		provides leClient: Runnable = client.unClient
+		
+		part client:ComposantClient{
+			bind unStoreIAF to storeIAF.unStoreIAF
+			bind unStoreIAPP to storeIAPP.unStoreIAPP
+		}
+		
+		part storeIAF:ComposantStoreIAF{
+			bind uneBank to bank.uneBank
+			bind unProviderCommande to providerCommande.unProviderCommande
+			bind unProviderInfos to providerInfos.unProviderInfos
+		}
+		
+		part storeIAPP:ComposantStoreIAPP{
+			bind uneBank to bank.uneBank
+			bind unProviderCommande to providerCommande.unProviderCommande
+			bind unProviderInfos to providerInfos.unProviderInfos
+		}
+		
+		part bank: ComposantBank{
+			bind estore to account.unAccount
+			bind anne to account.unAccount
+			bind bob to account.unAccount
+		}
+		
+		part account: ComposantAccount{	}
+		part providerCommande: ComposantProviderCommande{}
+		part providerInfos: ComposantProviderInfos{}
+	}
+}
